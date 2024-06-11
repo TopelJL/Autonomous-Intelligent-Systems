@@ -43,6 +43,7 @@ xhatstore = zeros(length(xhat), maxIter);
 
 SigmaXstore = zeros(length(xhat)^2, maxIter);
 
+% Loop through all iterations (40)
 for k = 1 : maxIter
     % KF Step 1a: State estimate time update.
     % In this step we are predicting the present state given only past
@@ -50,12 +51,20 @@ for k = 1 : maxIter
     xhat = A*xhat + B*u;
     
     % KF Step 1b: Error Covariance time update.
+    % A*SigmaX*A' term tells us we get more certain of the state estimate as time goes on. as the covariance gets smaller.
+    % Calculating the covariance of the prediction error.
     SigmaX = A*SigmaX*A' + SigmaW;
 
     % Implied operation of system in background, with input signal u, and
     % output signal z.
+
+    % Random input signal.
     u  = 0.5*randn(1) + cos(k/pi);
+
+    % Represents our random process input noise.
     w = chol(SigmaW)'*randn(length(xtrue));
+
+    % Represents our random sensor input noise.
     v = chol(SigmaV)'*randn(length(C*xtrue));
 
     % Z is based on present x and u.
@@ -69,11 +78,21 @@ for k = 1 : maxIter
     zhat = C*xhat + D*u;
 
     % KF Step 2a: Estimator (Kalman) gain matrix.
+    % This is the part of Kalman filtering that distinguishes from other estimation methods.
+    % We calculate Covariance matrix so we can update L.
+    % SigmaX*C' indicates relative need for correction and how well states are coupled to the measurements.
+    % SigmaX*C' Tells us about the state uncertainty.
+    % Larger SigmaX*C' means state is very uncertain, and would benefit from large update.
+    % Smaller SigmaX*C' means state is certain.
+    % C' gives the coupling between the state and the output. Zero entries means no influence, large entries means that the state has high influence to output prediction error.
+    % C*SigmaX*C'  indicates how the error in the state contributes to the error in the output estimnate.
+    % SigmaV indicates uncertainty in the sensore reading due to noise.
     L = SigmaX*C'/(C*SigmaX*C' + SigmaV);
 
     % KF Step 2b: State estimate measurement update.
     % Compute a state estimate by updating the priori estimate using the
     % estimator gai and the output prediction error.
+    % Zhat is what we expect the measurement to be based on our state estimate.
     xhat = xhat + L*(ztrue - zhat);
 
     % KF Step 2c: Error covariance measurement update.

@@ -5,6 +5,7 @@
 % ---------------------------------------------------------------------
 %   Description: Code is an example of a linear kalman filter
 %   problem from Colorado Boulder ECE 5550: Applied Kalman filtering
+&   by Dr. Gregory L. Plett.
 % ---------------------------------------------------------------------
 
 % Initialize simulation variables

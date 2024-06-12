@@ -4,6 +4,8 @@
 %                            Jaxon Topel
 % ---------------------------------------------------------------------
 %   Description: C++ Libraries for Linear Systems with additive noise
+%   
+%   Code written from https://github.com/pcdangio/ros-kalman_filter
 % ---------------------------------------------------------------------
 
 #include <C:\Users\N8300F\Desktop\Research\ROS\Autonomous-Intelligent-Systems\ROS_Code\include\kalman_filter\base.hpp>
@@ -34,6 +36,8 @@ base_t::base_t(uint32_t n_variables, uint32_t n_observers)
     // Allocate temporaries.
     base_t::t_xx.setZero(base_t::n_x, base_t::n_x);
 }
+
+// Deconstructor.
 base_t::~base_t()
 {
     // Stop logging if running.
@@ -57,10 +61,12 @@ bool base_t::has_observations() const
 {
     return !base_t::m_observations.empty();
 }
+
 bool base_t::has_observation(uint32_t observer_index) const
 {
     return base_t::m_observations.count(observer_index) != 0;
 }
+
 void base_t::masked_kalman_update()
 {
     // Get number of observations.

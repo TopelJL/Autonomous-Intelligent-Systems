@@ -10,6 +10,8 @@ Andrea Bajcsy, Somil Bansal, Eli Bronstein, Varun Tolani, and
 Please see "An_Efficient_Reachability-Based_Framework_
 for_Provably_Safe_Autonomous_Navigation_in_Unknown_Environments"
 Inside of our documents folder for original work done.
+ See website: https://doi.org/10.48550/arXiv.1905.00532
+ See website: https://abajcsy.github.io/safe_navigation/
 
 ## Contributions to the work.
 - Significant contributions have been made to this work such as developing an actual controller that is not hard coded at each time step to have a specific heading.

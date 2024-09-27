@@ -7,6 +7,14 @@
 # vehicles, and calls multiple functions that ensure our sim runs 
 # correct.
 #
+# Note(1): This research done was derived off of a paper by 
+# Andrea Bajcsy, Somil Bansal, Eli Bronstein, Varun Tolani, and 
+# Claire J. Tomlin.
+#
+# Note(2) Please see "An_Efficient_Reachability-Based_Framework_
+# for_Provably_Safe_Autonomous_Navigation_in_Unknown_Environments"
+# Inside of our documents folder for original work done.
+#
 # Author        Date        Description
 # ------        ----        ------------
 # Jaxon Topel   9/27/24     Initial Matlab to python conversion

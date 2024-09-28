@@ -20,6 +20,7 @@
 # ---------------------------------------------------------------------
 
 import numpy as np
+import getControlDubins as controller
 
 def getAvoidingControlDubins(t, x, goal, avoid_obj):
     """
@@ -39,7 +40,7 @@ def getAvoidingControlDubins(t, x, goal, avoid_obj):
     theta = x[2]
 
     # Compute control to steer toward the goal.
-    u_goal = getControlDubins(t, x, goal)
+    u_goal = controller.getControlDubins(t, x, goal)
 
     # Calculate the distance to the obstacle's avoid set.
     avoid_dist = avoid_obj.getMinDistanceToObstacle(pos)

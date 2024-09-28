@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------
-#                             plotter.py
+#                             Plotter.py
 #                    University of Central Florida
 #              Autonomous & Intelligent Systems Labratory
 #

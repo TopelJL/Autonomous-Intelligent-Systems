@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------
-#                            AvoidSet.py
+#                        test_local_vs_global.py
 #                    University of Central Florida
 #              Autonomous & Intelligent Systems Labratory
 #
@@ -14,7 +14,7 @@
 # Inside of our documents folder for original work done.
 #
 # Author        Date        Description
-# -----------   -------     -----------------------------------
+# ------        ----        ------------
 # Jaxon Topel   9/27/24     Initial Matlab to python conversion
 # Ryan Rahroo   9/27/24     Iniital Matlab to python conversion
 # ---------------------------------------------------------------------

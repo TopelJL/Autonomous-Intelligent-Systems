@@ -23,10 +23,20 @@
 # Ryan Rahroo   9/27/24     Iniital Matlab to python conversion
 # ---------------------------------------------------------------------
 
+# Functional Imports.
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 from datetime import datetime
+
+# Class imports.
+import AvoidSet
+import Plotter
+import getAvoidingControlDubins
+
+# ----------------
+# CODE BEGINS HERE
+# ----------------
 
 # Clear the figure and variables
 plt.clf()
@@ -119,8 +129,8 @@ y = obj2.dyn_sys.x
 
 for t in range(T):
     # Get current control
-    u1 = get_avoiding_control_dubins(t, obj1.dyn_sys.x, x_goal, obj1)
-    u2 = get_avoiding_control_dubins(t, obj2.dyn_sys.x, y_goal, obj2)
+    u1 = getAvoidingControlDubins(t, obj1.dyn_sys.x, x_goal, obj1)
+    u2 = getAvoidingControlDubins(t, obj2.dyn_sys.x, y_goal, obj2)
 
     # Apply control to dynamics
     obj1.dyn_sys.update_state(u1, dt, obj1.dyn_sys.x)

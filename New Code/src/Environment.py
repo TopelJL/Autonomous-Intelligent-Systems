@@ -146,6 +146,11 @@ class Environment(gym.Env):
         # Plot the goal (if defined)
         if env.goal_position is not None:
             ax.plot(env.goal_position[0], env.goal_position[1], 'go', markersize=10)
+            
+        # Plot the map
+        for obstacle in env.map:
+            x, y = zip(*obstacle)
+            ax.fill(x, y, 'gray', alpha=0.5)
 
         # Show the plot
         plt.show()

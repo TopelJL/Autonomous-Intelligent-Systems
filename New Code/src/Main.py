@@ -14,7 +14,7 @@
 # Import necessary modules.
 from Environment import Environment
 from ModelTrain import train_agent
-from NeuralNetwork import DQN
+from NeuralNetwork import Actor, Critic
 
 # Define hyperparameters (adjust these as needed)
 # -----------------------------------------------
@@ -29,11 +29,12 @@ num_evaluation_episodes = 10
 # Initialize the simulation environment for Simultaneous Localization and mapping (SLAM).
 env = Environment()
 
-# Define and create the neural network.
-model = DQN(env.observation_space.shape[0], env.action_space.n)  
+# Define and create the neural networks for Soft Actor-Critic.
+actor = Actor(env.observation_space.shape[0], env.action_space.n)
+critic = Critic(env.observation_space.shape[0], env.action_space.n)
 
-# Train the agent.
-agent = train_agent(model, env, learning_rate, num_episodes)
+# Train the agent using SAC (modify train_agent function accordingly)
+agent = train_agent(actor, critic, env, learning_rate, num_episodes)
 
 # Evaluate the trained agent.
 evaluate_agent(agent, env, num_evaluation_episodes)

@@ -14,6 +14,8 @@
 # Note(2) Please see "An_Efficient_Reachability-Based_Framework_
 # for_Provably_Safe_Autonomous_Navigation_in_Unknown_Environments"
 # Inside of our documents folder for original work done.
+# See website: https://doi.org/10.48550/arXiv.1905.00532
+# See website: https://abajcsy.github.io/safe_navigation/
 #
 # Author        Date        Description
 # ------        ----        ------------

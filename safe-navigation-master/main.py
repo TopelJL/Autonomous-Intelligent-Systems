@@ -20,7 +20,7 @@
 # Author        Date        Description
 # ------        ----        ------------
 # Jaxon Topel   9/27/24     Initial Matlab to python conversion
-# Ryan Rahroo   9/27/24     Iniital Matlab to python conversion
+# Ryan Rahrooh   9/27/24     Iniital Matlab to python conversion
 # ---------------------------------------------------------------------
 
 # Functional Imports.
@@ -47,46 +47,49 @@ low_env = np.array([0, 0])
 up_env = np.array([10, 10])
 
 # Create first obstacle
-obs_shape = 'rectangle'
+obs_shape = 'rectangle'  # Can be 'rectangle' or 'circle'
 
 if obs_shape == 'rectangle':
     # Create lower and upper bounds on rectangle
     low_real_obs = np.array([3, 2])
     up_real_obs = np.array([6, 5])
-else:
-    # Setup circular obstacle
+elif obs_shape == 'circle':
+    # Setup circular obstacle with center and radius
     low_real_obs = np.array([5.5, 2.5])  # Center of circle
     up_real_obs = np.array([1.5, 1.5])   # Radius of circle
+else:
+    raise ValueError('Unsupported obstacle shape')
 
 # Setup computation domains and discretization
 grid_low = np.concatenate([low_env, [-np.pi]])
 grid_up = np.concatenate([up_env, [np.pi]])
-N = np.array([31, 31, 21])
+N = np.array([31, 31, 21])  # Discretization steps
 
 # Timestep for computation and simulation
 dt = 0.05
 
-# Initial and final locations
-x_init = np.array([2.0, 4.0, np.pi/2])
-y_init = np.array([9.0, 9.0, -np.pi/2])
+# Initial and final locations for both vehicles
+vehicle_1_init = np.array([2.0, 4.0, np.pi/2])
+vehicle_2_init = np.array([9.0, 9.0, -np.pi/2])
 
-x_goal = np.array([8, 1.5, -np.pi/2])
-y_goal = np.array([9, 1.5, -np.pi/2])
+goal_vehicle_1 = np.array([8, 1.5, -np.pi/2])
+goal_vehicle_2 = np.array([9, 1.5, -np.pi/2])
 
 # Construct sensed region
-sense_shape = 'camera'
+sense_shape = 'camera'  # Options: 'circle', 'camera'
+
 if sense_shape == 'circle':
     sense_rad = 1.5
-    sense_data1 = [x_init, np.array([sense_rad, sense_rad])]
-    sense_data2 = [y_init, np.array([sense_rad, sense_rad])]
+    sense_data_vehicle_1 = [vehicle_1_init, np.array([sense_rad, sense_rad])]
+    sense_data_vehicle_2 = [vehicle_2_init, np.array([sense_rad, sense_rad])]
 elif sense_shape == 'camera':
     initial_R = 1.5  # Initial radius of the safe region
     sense_FOV = np.pi / 6  # Field-of-view of the camera
     sense_rad = 1.5
-    sense_data1 = [x_init, np.array([sense_FOV, initial_R])]
-    sense_data2 = [y_init, np.array([sense_FOV, initial_R])]
+    sense_data_vehicle_1 = [vehicle_1_init, np.array([sense_FOV, initial_R])]
+    sense_data_vehicle_2 = [vehicle_2_init, np.array([sense_FOV, initial_R])]
 else:
-    raise ValueError("Unknown sensor type")
+    raise ValueError("Unsupported sensor type")
 
 # Update method and setup avoid sets
 update_method = 'localQ'
@@ -96,19 +99,25 @@ save_output_data = True
 noise_mean = 0
 noise_std = 0.5
 
-if warm_start:
-    filename = f"{update_method}_warm_{datetime.now().strftime('%Y%m%d_%H%M%S')}.npz"
-else:
-    filename = f"{update_method}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.npz"
+# Create filename for saving results
+timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+filename = f"{update_method}_{'warm_' if warm_start else ''}{timestamp}.npz"
 
-# First vehicle AvoidSet object
+# Initialize AvoidSet objects for both vehicles
 curr_time = 1
-obj1 = AvoidSet(grid_low, grid_up, low_real_obs, up_real_obs, obs_shape, x_init, N, dt, update_epsilon, warm_start, update_method, noise_mean, noise_std, sense_rad)
-obj1.compute_avoid_set(sense_data1, sense_shape, curr_time, x_init)
 
-# Second vehicle AvoidSet object
-obj2 = AvoidSet(grid_low, grid_up, low_real_obs, up_real_obs, obs_shape, y_init, N, dt, update_epsilon, warm_start, update_method, noise_mean, noise_std, sense_rad)
-obj2.compute_avoid_set(sense_data2, sense_shape, curr_time, y_init)
+try:
+    # Vehicle 1
+    vehicle_1 = AvoidSet(grid_low, grid_up, low_real_obs, up_real_obs, obs_shape, vehicle_1_init, N, dt, update_epsilon, warm_start, update_method, noise_mean, noise_std, sense_rad)
+    vehicle_1.compute_avoid_set(sense_data_vehicle_1, sense_shape, curr_time, vehicle_1_init)
+
+    # Vehicle 2
+    vehicle_2 = AvoidSet(grid_low, grid_up, low_real_obs, up_real_obs, obs_shape, vehicle_2_init, N, dt, update_epsilon, warm_start, update_method, noise_mean, noise_std, sense_rad)
+    vehicle_2.compute_avoid_set(sense_data_vehicle_2, sense_shape, curr_time, vehicle_2_init)
+
+except Exception as e:
+    print(f"Error initializing AvoidSet objects: {e}")
+    raise
 
 # Plot initial conditions
 fig, ax = plt.subplots()
@@ -116,68 +125,65 @@ plt.ion()  # Turn on interactive mode
 plt.show()
 
 # Plot environment, car, and sensing regions
-plt_obj = Plotter(low_env, up_env, low_real_obs, up_real_obs, obs_shape)
-plt_obj.update_plot(x_init, obj1)
-plt_obj.update_plot(y_init, obj2)
+plotter = Plotter(low_env, up_env, low_real_obs, up_real_obs, obs_shape)
+plotter.update_plot(vehicle_1_init, vehicle_1)
+plotter.update_plot(vehicle_2_init, vehicle_2)
 plt.draw()
-time.sleep(dt)
 
 # Simulate Dubins car movement
-T = 200
-x = obj1.dyn_sys.x
-y = obj2.dyn_sys.x
-
+T = 200  # Number of time steps
 for t in range(T):
-    # Get current control
-    u1 = getAvoidingControlDubins(t, obj1.dyn_sys.x, x_goal, obj1)
-    u2 = getAvoidingControlDubins(t, obj2.dyn_sys.x, y_goal, obj2)
+    try:
+        # Get current control for both vehicles
+        u1 = getAvoidingControlDubins(t, vehicle_1.dyn_sys.x, goal_vehicle_1, vehicle_1)
+        u2 = getAvoidingControlDubins(t, vehicle_2.dyn_sys.x, goal_vehicle_2, vehicle_2)
 
-    # Apply control to dynamics
-    obj1.dyn_sys.update_state(u1, dt, obj1.dyn_sys.x)
-    obj2.dyn_sys.update_state(u2, dt, obj2.dyn_sys.x)
+        # Apply control to dynamics
+        vehicle_1.dyn_sys.update_state(u1, dt, vehicle_1.dyn_sys.x)
+        vehicle_2.dyn_sys.update_state(u2, dt, vehicle_2.dyn_sys.x)
 
-    x = obj1.dyn_sys.x
-    y = obj2.dyn_sys.x
+        # Update positions
+        x1 = vehicle_1.dyn_sys.x
+        x2 = vehicle_2.dyn_sys.x
 
-    # Compute new sensing regions with noise
-    if sense_shape == 'circle':
-        print(f'(x, y, heading) position of 1st vehicle without noise: {x}')
-        obj1.add_gaussian_noise(x)
+        # Add Gaussian noise to sensing
+        vehicle_1.add_gaussian_noise(x1)
+        vehicle_2.add_gaussian_noise(x2)
 
-        print(f'(x, y, heading) position of 2nd vehicle without noise: {y}')
-        obj2.add_gaussian_noise(y)
-
-        sense_data1 = [x, np.array([sense_rad, sense_rad])]
-        sense_data2 = [y, np.array([sense_rad, sense_rad])]
-    elif sense_shape == 'camera':
-        print(f'(x, y, heading) position of 1st vehicle without noise: {x}')
-        obj1.add_gaussian_noise(x)
-
-        print(f'(x, y, heading) position of 2nd vehicle without noise: {y}')
-        obj2.add_gaussian_noise(y)
-
-        sense_data1 = [x, np.array([sense_FOV, initial_R])]
-        sense_data2 = [y, np.array([sense_FOV, initial_R])]
+        # Update sensed data
+        if sense_shape == 'circle':
+            sense_data_vehicle_1 = [x1, np.array([sense_rad, sense_rad])]
+            sense_data_vehicle_2 = [x2, np.array([sense_rad, sense_rad])]
+        elif sense_shape == 'camera':
+            sense_data_vehicle_1 = [x1, np.array([sense_FOV, initial_R])]
+            sense_data_vehicle_2 = [x2, np.array([sense_FOV, initial_R])]
 
         # Update obstacle info based on sensed data
-        obj1.update_obstacle_detection(x, low_real_obs, up_real_obs)
-        obj2.update_obstacle_detection(y, low_real_obs, up_real_obs)
-    else:
-        raise ValueError('Unknown sensor type')
+        vehicle_1.update_obstacle_detection(x1, low_real_obs, up_real_obs)
+        vehicle_2.update_obstacle_detection(x2, low_real_obs, up_real_obs)
 
-    print(f'Time Step: {t + 1}')
+        # Compute avoid set for both vehicles
+        vehicle_1.compute_avoid_set(sense_data_vehicle_1, sense_shape, t + 1, x1)
+        vehicle_2.compute_avoid_set(sense_data_vehicle_2, sense_shape, t + 1, x2)
 
-    # Compute avoid set
-    obj1.compute_avoid_set(sense_data1, sense_shape, t + 1, x)
-    obj2.compute_avoid_set(sense_data2, sense_shape, t + 1, y)
+        # Update plot
+        plotter.update_plot(x1, vehicle_1)
+        plotter.update_plot(x2, vehicle_2)
+        plt.draw()
+        plt.pause(0.001)  # Use plt.pause instead of time.sleep for better plot responsiveness
 
-    # Update plot
-    plt_obj.update_plot(x, obj1)
-    plt_obj.update_plot(y, obj2)
-    plt.draw()
-    time.sleep(dt)
+        # Log progress
+        print(f"Time Step: {t + 1} completed")
+
+    except Exception as e:
+        print(f"Error during simulation at time step {t + 1}: {e}")
+        break
 
 # Save output data
 if save_output_data:
-    np.savez(filename, valueFunCellArr=obj1.value_fun_cell_arr, lxCellArr=obj1.lx_cell_arr, QSizeCellArr=obj1.q_size_cell_arr,
-             solnTimes=obj1.soln_times, fovCellArr=obj1.fov_cell_arr)
+    try:
+        np.savez(filename, valueFunCellArr=vehicle_1.value_fun_cell_arr, lxCellArr=vehicle_1.lx_cell_arr, QSizeCellArr=vehicle_1.q_size_cell_arr,
+                 solnTimes=vehicle_1.soln_times, fovCellArr=vehicle_1.fov_cell_arr)
+        print(f"Simulation data saved to {filename}")
+    except Exception as e:
+        print(f"Error saving output data: {e}")

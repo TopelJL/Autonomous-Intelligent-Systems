@@ -16,5 +16,7 @@
 # Author        Date        Description
 # ------        ----        ------------
 # Jaxon Topel   9/27/24     Initial Matlab to python conversion
-# Ryan Rahroo   9/27/24     Iniital Matlab to python conversion
+# Ryan Rahrooh  9/27/24     Iniital Matlab to python conversion
 # ---------------------------------------------------------------------
+
+print("Hi Jaxon Topel")

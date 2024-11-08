@@ -96,4 +96,8 @@ extra = {
 """
 
 # Optional: Add legend
+<<<<<<< HEAD
 # plt.legend(['old V(x)', 'old l(x)', 'new l(x)', 'new V(x)'])
+=======
+# plt.legend(['old V(x)', 'old l(x)', 'new l(x)', 'new V(x)'])
+>>>>>>> 3a683ff1f2e69270c34ce516750bfd6788ab5c55

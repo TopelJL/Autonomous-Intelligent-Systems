@@ -244,4 +244,8 @@ if __name__ == "__main__":
     
     # Run simulation
     value_fun_path = os.path.join('safe_navigation', 'data', 'groundTruthValueFuns.mat')
+<<<<<<< HEAD
     navigator.run_simulation(value_fun_path)
+=======
+    navigator.run_simulation(value_fun_path)
+>>>>>>> 3a683ff1f2e69270c34ce516750bfd6788ab5c55
